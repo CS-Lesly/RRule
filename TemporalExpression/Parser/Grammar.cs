@@ -18,11 +18,11 @@ public class Terminal(string value) : Expression
 {
     public string Value { get; init; } = value;
 
-    public const string COLON = ":";
-    public const string SEMICOLON = ";";
-    public const string COMMA = ",";
-    public const string EQUALS = "=";
-    public const string NEWLINE = "\r\n";
+    public static Terminal COLON     => new(":");
+    public static Terminal SEMICOLON => new(";");
+    public static Terminal COMMA     => new(",");
+    public static Terminal EQUALS    => new("=");
+    public static Terminal NEWLINE   => new("\r\n");
 }
 
 public class Sequence(params Expression[] expressions) : Expression

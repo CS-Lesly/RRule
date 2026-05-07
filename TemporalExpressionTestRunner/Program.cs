@@ -3,7 +3,7 @@ using System.IO;
 
 var assemblyDirectory = AppContext.BaseDirectory;
 var repoRoot = Path.GetFullPath(Path.Combine(assemblyDirectory, "..", "..", "..", ".."));
-var testProject = Path.Combine(repoRoot, "RRule.Tests.Unit", "Tests", "RRule.Tests.csproj");
+var testProject = Path.Combine(repoRoot, "TemporalExpression.Tests.Unit", "Tests", "TemporalExpression.Tests.csproj");
 
 if (!File.Exists(testProject))
 {

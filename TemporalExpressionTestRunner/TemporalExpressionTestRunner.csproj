@@ -9,6 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RRule\RRule.csproj" />
+    <ProjectReference Include="..\TemporalExpression\TemporalExpression.csproj" />
   </ItemGroup>
 </Project>

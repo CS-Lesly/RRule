@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TemporalExpression/TemporalExpression.csproj" />
+  <Project Path="TemporalExpression.Tests.Unit/Tests/TemporalExpression.Tests.csproj" />
+  <Project Path="TemporalExpressionTestRunner/TemporalExpressionTestRunner.csproj" />
+</Solution>

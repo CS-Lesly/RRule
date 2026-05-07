@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="RRule/RRule.csproj" />
-  <Project Path="RRule.Tests.Unit/Tests/RRule.Tests.csproj" />
-  <Project Path="RRuleTestRunner/RRuleTestRunner.csproj" />
-</Solution>

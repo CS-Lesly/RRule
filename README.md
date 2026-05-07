@@ -2,5 +2,5 @@
 
 ## Run associated unittests
 ```
-dotnet run --project ./RRuleTestRunner/RRuleTestRunner.csproj
+dotnet run --project ./TemporalExpressionTestRunner/TemporalExpressionTestRunner.csproj
 ```

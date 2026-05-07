@@ -3,10 +3,10 @@ namespace TemporalExpression;
 public class DateRange : ITemporalExpression
 {
     protected DateTime _start; // TODO nullable
-  //protected Duration? _duration;
+  //protected ExtendedTimeSpan? _from;
 
     protected DateTime? _end;
-  //protected Duration? _duration;
+  //protected ExtendedTimeSpan? _until;
 
     public IEnumerable<DateTimePoint> ToDateTimePoints(DateTime startDate, DateTime endDate)
     {

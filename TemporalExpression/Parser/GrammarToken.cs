@@ -2,22 +2,20 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TemporalExpression.Parser;
 
-public abstract class GrammarToken<T> : ParsableExpression where T : new()
+public abstract class GrammarToken<TToken, TResult> : ParsableExpression where TToken : GrammarToken<TToken, TResult>, new()
 {
     public abstract Expression Syntax { get; }
-    public virtual ParseResult OnParsed([DisallowNull]T node, List<object> children, ref TokenStream stream)
-        => ParseResult.Ok(node);
+    public abstract ParseResult OnParsed([DisallowNull]TToken node, List<object> tokens, ref TokenStream stream);
 
     public sealed override ParseResult Parse(ref TokenStream stream)
     {
         int startPos = stream.Position;
 
-        var node = new T();
-        var children = new List<object>();
-        var result = GrammarToken<T>.ExecuteMatch(Syntax, children, ref stream);
-        if (result.Success)
+        var tokens = new List<object>();
+        var result = GrammarToken<TToken, TResult>.ExecuteMatch(Syntax, tokens, ref stream);
+        if (result.IsParsed)
         {
-            return OnParsed(node, children, ref stream);
+            return OnParsed(new TToken(), tokens, ref stream);
         }
         if (result.Error.HasValue)
         {
@@ -25,26 +23,27 @@ public abstract class GrammarToken<T> : ParsableExpression where T : new()
         }
 
         stream.Seek(startPos);
-        return new(); // soft mismatch
+
+        return ParseResult.Retry;
     }
 
-    private static ParseResult ExecuteMatch(Expression expression, List<object> children, ref TokenStream stream) => expression switch
+    private static ParseResult ExecuteMatch(Expression expression, List<object> tokens, ref TokenStream stream) => expression switch
     {
         Terminal terminal => stream.MatchAndConsume(terminal.Value)
-            ? ParseResult.Ok(terminal.Value)
+            ? ParseResult.Continue
             : ParseResult.Fail($"Expected terminal `{terminal.Value}`", stream),
 
-        Choice   choice   => HandleChoice(  choice,   children, ref stream),
-        Optional optional => HandleOptional(optional, children, ref stream),
-        Repeat   repeat   => HandleRepeat(  repeat,   children, ref stream),
-        Sequence sequence => HandleSequence(sequence, children, ref stream),
+        Choice   choice   => HandleChoice(  choice,   tokens, ref stream),
+        Optional optional => HandleOptional(optional, tokens, ref stream),
+        Repeat   repeat   => HandleRepeat(  repeat,   tokens, ref stream),
+        Sequence sequence => HandleSequence(sequence, tokens, ref stream),
 
-        ParsableExpression subExpression => HandleSubExpression(subExpression, children, ref stream),
+        ParsableExpression subExpression => HandleSubExpression(subExpression, tokens, ref stream),
 
         _ => ParseResult.Fail("Syntax error", stream),
     };
 
-    private static ParseResult HandleChoice(Choice choice, List<object> children, ref TokenStream stream)
+    private static ParseResult HandleChoice(Choice choice, List<object> tokens, ref TokenStream stream)
     {
         int startPosition = stream.Position;
 
@@ -52,8 +51,8 @@ public abstract class GrammarToken<T> : ParsableExpression where T : new()
         {
             stream.Seek(startPosition);
 
-            var result = ExecuteMatch(option, children, ref stream);
-            if (result.Success || result.Error.HasValue)
+            var result = ExecuteMatch(option, tokens, ref stream);
+            if (result.IsParsed || result.Error.HasValue)
             {
                 return result;
             }
@@ -62,22 +61,26 @@ public abstract class GrammarToken<T> : ParsableExpression where T : new()
         return ParseResult.Fail("Syntax error, no matching option found", stream);
     }
 
-    private static ParseResult HandleOptional(Optional optional, List<object> children, ref TokenStream stream)
+    private static ParseResult HandleOptional(Optional optional, List<object> tokens, ref TokenStream stream)
     {
-        ExecuteMatch(optional.Expression, children, ref stream);
+        var result = ExecuteMatch(optional.Expression, tokens, ref stream);
+        if (result.IsParsed || result.Error.HasValue)
+        {
+            return result;
+        }
 
-        return ParseResult.Ok(children);
+        return ParseResult.Continue; // TODO Retry?
     }
 
-    private static ParseResult HandleRepeat(Repeat repeat, List<object> children, ref TokenStream stream)
+    private static ParseResult HandleRepeat(Repeat repeat, List<object> tokens, ref TokenStream stream)
     {
         int counter = 0;
         while (true)
         {
             int startPosition = stream.Position;
 
-            var result = ExecuteMatch(repeat.Expression, children, ref stream);
-            if (result.Success)
+            var result = ExecuteMatch(repeat.Expression, tokens, ref stream);
+            if (result.IsParsed)
             {
                 ++counter;
                 continue;
@@ -107,25 +110,26 @@ public abstract class GrammarToken<T> : ParsableExpression where T : new()
             return ParseResult.Fail($"Expected at most {repeat.Maximum.Value} repetitions, but got {counter}", stream);
         }
 
-        return ParseResult.Ok(children);
+        return ParseResult.Continue;
     }
 
-    private static ParseResult HandleSequence(Sequence sequence, List<object> children, ref TokenStream stream)
+    private static ParseResult HandleSequence(Sequence sequence, List<object> tokens, ref TokenStream stream)
     {
         int startPosition = stream.Position;
+
         // We use a local bucket so we don't pollute the main one if the sequence fails
-        var newChildren = new List<object>(); 
+        var newTokens = new List<object>(); 
 
         for (int i = 0; i < sequence.Expressions.Length; i++) 
         {
-            var result = ExecuteMatch(sequence.Expressions[i], newChildren, ref stream);
-            if (!result.Success)
+            var result = ExecuteMatch(sequence.Expressions[i], newTokens, ref stream);
+            if (!result.IsParsed)
             {
                 if (i == 0) 
                 {
                     stream.Seek(startPosition);
 
-                    return new(); // If the VERY FIRST element failed, it's just a soft mismatch
+                    return ParseResult.Retry; // only if the VERY FIRST element failed
                 }
 
                 return result.Error.HasValue
@@ -134,17 +138,18 @@ public abstract class GrammarToken<T> : ParsableExpression where T : new()
             }
         }
 
-        children.AddRange(newChildren);
-        return ParseResult.Ok(children);
+        tokens.AddRange(newTokens);
+
+        return ParseResult.Continue;
     }
 
-    private static ParseResult HandleSubExpression(ParsableExpression expression, List<object> children, ref TokenStream stream)
+    private static ParseResult HandleSubExpression(ParsableExpression expression, List<object> tokens, ref TokenStream stream)
     {
         var result = expression.Parse(ref stream);
-        if (result.Success
+        if (result.IsParsed
         &&  result.Value is not null)
         {
-            children.Add(result.Value);
+            tokens.Add(result.Value);
         }
 
         return result;

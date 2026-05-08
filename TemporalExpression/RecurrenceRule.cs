@@ -2,10 +2,7 @@ namespace TemporalExpression;
 
 public enum Frequency { Daily, Weekly, Monthly, Yearly };
 
-public sealed class RRuleExpression : RuleExpression;
-public sealed class ExRuleExpression : RuleExpression;
-
-public abstract class RuleExpression : ITemporalExpression
+public record RecurrenceRule : TemporalComponent, ITemporalExpression
 {
     public Frequency Frequency { get; set; }
 

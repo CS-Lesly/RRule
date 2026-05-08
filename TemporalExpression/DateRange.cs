@@ -1,6 +1,6 @@
 namespace TemporalExpression;
 
-public class DateRange : ITemporalExpression
+public record DateRange : TemporalComponent, ITemporalExpression
 {
     protected DateTime _start; // TODO nullable
   //protected ExtendedTimeSpan? _from;

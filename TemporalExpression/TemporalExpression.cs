@@ -2,11 +2,8 @@ namespace TemporalExpression;
 
 public class TemporalExpression : ITemporalExpression
 {
-    public List<RRuleExpression> RRules { get; set; } = [];
-    public List<ExRuleExpression> ExRules { get; set; } = [];
-
-    public List<RDateExpression> RDates { get; set; } = [];
-    public List<ExDateExpression> ExDates { get; set; } = [];
+    public List<TemporalComponent> Inclusions { get; set; } = [];
+    public List<TemporalComponent> Exclusions { get; set; } = [];
 
     public IEnumerable<DateTime> ToDateTimes(DateTime startDate, DateTime endDate)
     {
@@ -17,38 +14,43 @@ public class TemporalExpression : ITemporalExpression
 
     public IEnumerable<DateTimePoint> ToDateTimePoints(DateTime startDate, DateTime endDate)
     {
-        IEnumerable<DateTimePoint> rRules = [.. RRules.SelectMany(rule => rule.ToDateTimePoints(startDate, endDate))];
-        IEnumerable<DateTimePoint> rDates = [.. RDates.SelectMany(date => date.ToDateTimePoints(startDate, endDate))];
+        var inclusions = new List<DateTimePoint>(Inclusions.SelectMany(inclusion => ExpandRuleComponent(inclusion, startDate, endDate)));
 
-        var result = rRules.Union(rDates).Distinct().ToList();
-        if (result.Count == 0)
+        inclusions = [.. inclusions.Distinct()];
+        if (inclusions.Count == 0)
         {
-            return result;
+            return [];
         }
 
-        foreach (var exDate in ExDates)
+        var exclusions = new List<DateTimePoint>(Exclusions.SelectMany(exclusion => ExpandRuleComponent(exclusion, startDate, endDate)));
+        if (exclusions.Count > 0)
         {
-            result = Exclude(result, exDate.ToDateTimePoints(startDate, endDate));
-            if (result.Count == 0)
+            inclusions = Exclude(inclusions, exclusions);
+            if (inclusions.Count == 0)
             {
-                return result;
-            }
-        }
-        foreach (var exRule in ExRules)
-        {
-            result = Exclude(result, exRule.ToDateTimePoints(startDate, endDate));
-            if (result.Count == 0)
-            {
-                return result;
+                return [];
             }
         }
 
-        result.Sort();
+        inclusions.Sort();
 
-        return result;
+        return inclusions;
     }
 
-    public static List<DateTimePoint> Exclude(List<DateTimePoint> items, IEnumerable<DateTimePoint> itemsToExclude)
+    private static IEnumerable<DateTimePoint> ExpandRuleComponent(TemporalComponent temporalComponent, DateTime startDate, DateTime endDate)
+        => temporalComponent switch
+        {
+            DateTimeComponent dateTimeComponent => [DateTimePoint.FromDateTime(dateTimeComponent.DateTime)],
+            DateOnlyComponent dateOnlyComponent => [new DateTimePoint(dateOnlyComponent.Date)],
+
+            DateRange dateRange => dateRange.ToDateTimePoints(startDate, endDate),
+
+            RecurrenceRule recurrenceRule => recurrenceRule.ToDateTimePoints(startDate, endDate),
+
+            _ => throw new ArgumentException($"Unhandled temporal component type {temporalComponent.GetType().Name}", nameof(temporalComponent))
+        };
+
+    private static List<DateTimePoint> Exclude(IEnumerable<DateTimePoint> items, IEnumerable<DateTimePoint> itemsToExclude)
     {
         // 1. Pre-process the excludes list into a fast-lookup Dictionary
         // Key: Date, Value: (Is it an all-day exclusion?, Set of specific times to exclude)

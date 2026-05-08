@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TemporalExpression.Parser;
 
-public abstract class GrammarToken<TToken, TResult> : ParsableExpression where TToken : GrammarToken<TToken, TResult>, new()
+public abstract class GrammarToken<TToken> : ParsableExpression where TToken : GrammarToken<TToken>, new()
 {
     public abstract Expression Syntax { get; }
     public abstract ParseResult OnParsed([DisallowNull]TToken node, List<object> tokens, ref TokenStream stream);
@@ -12,7 +12,7 @@ public abstract class GrammarToken<TToken, TResult> : ParsableExpression where T
         int startPos = stream.Position;
 
         var tokens = new List<object>();
-        var result = GrammarToken<TToken, TResult>.ExecuteMatch(Syntax, tokens, ref stream);
+        var result = GrammarToken<TToken>.ExecuteMatch(Syntax, tokens, ref stream);
         if (result.IsParsed)
         {
             return OnParsed(new TToken(), tokens, ref stream);

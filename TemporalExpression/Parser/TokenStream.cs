@@ -74,7 +74,7 @@ public ref struct TokenStream
         int temporaryPosition = Position;
         while (temporaryPosition < _input.Length && condition(_input[temporaryPosition]))
         {
-            temporaryPosition = SkipFolds(temporaryPosition);
+            temporaryPosition = SkipFolds(++temporaryPosition);
         }
 
         if (temporaryPosition == Position)

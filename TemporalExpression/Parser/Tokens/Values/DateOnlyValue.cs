@@ -6,7 +6,7 @@ public class DateOnlyValue : ParsableExpression
 {
     public override ParseResult Parse(ref TokenStream stream)
     {
-        if (stream.ConsumeWhile(char.IsLetterOrDigit, out string? stringValue))
+        if (stream.ConsumeWhile(char.IsDigit, out string? stringValue))
         {
             if (DateOnly.TryParseExact(stringValue, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
             {

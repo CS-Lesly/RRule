@@ -11,7 +11,7 @@ public class TemporalExpressionParser
         if (parseResult.IsParsed)
         {
             result = null;
-            return (TemporalExpression)parseResult.Value!;
+            return ((TemporalExpressionToken)parseResult.Value!).TemporalExpression;
         }
         else
         {

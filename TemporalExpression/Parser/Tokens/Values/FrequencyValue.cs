@@ -2,29 +2,38 @@ namespace TemporalExpression.Parser.Tokens.Values;
 
 public class FrequencyValue : ParsableExpression
 {
+    public Frequency? Value { get; private set; }
+
     public override ParseResult Parse(ref TokenStream stream)
     {
-        // Peek at the key to decide which token to use
         int start = stream.Position;
+
+        Frequency result;
         if (stream.MatchAndConsume("DAILY"))
         {
-            return ParseResult.Parsed(Frequency.Daily);
+            result = Frequency.Daily;
         }
-        if (stream.MatchAndConsume("WEEKLY"))
+        else if (stream.MatchAndConsume("WEEKLY"))
         {
-            return ParseResult.Parsed(Frequency.Weekly);
+            result = Frequency.Weekly;
         }
-        if (stream.MatchAndConsume("MONTHLY"))
+        else if (stream.MatchAndConsume("MONTHLY"))
         {
-            return ParseResult.Parsed(Frequency.Monthly);
+            result = Frequency.Monthly;
         }
-        if (stream.MatchAndConsume("YEARLY"))
+        // "QUARTERLY" | "SEMESTERLY" TODO
+        else if (stream.MatchAndConsume("YEARLY"))
         {
-            return ParseResult.Parsed(Frequency.Yearly);
+            result = Frequency.Yearly;
+        }
+        else
+        {
+            stream.Seek(start);
+
+            return ParseResult.Fail("Unknown frequency", stream);
         }
 
-        stream.Seek(start);
-
-        return ParseResult.Fail("Unknown frequency", stream);
+        Value = result;
+        return ParseResult.Parsed(this);
     }
 }

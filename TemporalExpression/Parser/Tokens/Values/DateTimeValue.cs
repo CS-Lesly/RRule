@@ -4,13 +4,16 @@ namespace TemporalExpression.Parser.Tokens.Values;
 
 public class DateTimeValue : ParsableExpression
 {
+    public DateTime? Value { get; private set; }
+
     public override ParseResult Parse(ref TokenStream stream)
     {
         if (stream.ConsumeWhile(char.IsLetterOrDigit, out string? stringValue))
         {
             if (DateTime.TryParseExact(stringValue, "yyyyMMddTHHmm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
             {
-                return ParseResult.Parsed(result);
+                Value = result;
+                return ParseResult.Parsed(this);
             }
             else
             {

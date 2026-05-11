@@ -23,6 +23,8 @@ public class Terminal(string value) : Expression
     public static Terminal COMMA     => new(",");
     public static Terminal EQUALS    => new("=");
     public static Terminal NEWLINE   => new("\r\n");
+    public static Terminal PLUS      => new("+");
+    public static Terminal MINUS     => new("-");
 }
 
 public class Sequence(params Expression[] expressions) : Expression

@@ -1,6 +1,6 @@
 namespace TemporalExpression;
 
-public enum Frequency { Daily, Weekly, Monthly, Yearly };
+public enum Frequency { Daily, Weekly, Monthly, Quarterly, Semesterly, Yearly };
 
 public record RecurrenceRule : TemporalComponent, ITemporalExpression
 {

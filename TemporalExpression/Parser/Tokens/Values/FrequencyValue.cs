@@ -8,32 +8,17 @@ public class FrequencyValue : ParsableExpression
     {
         int start = stream.Position;
 
-        Frequency result;
-        if (stream.MatchAndConsume("DAILY"))
+        foreach (Frequency frequency in Enum.GetValues<Frequency>())
         {
-            result = Frequency.Daily;
-        }
-        else if (stream.MatchAndConsume("WEEKLY"))
-        {
-            result = Frequency.Weekly;
-        }
-        else if (stream.MatchAndConsume("MONTHLY"))
-        {
-            result = Frequency.Monthly;
-        }
-        // "QUARTERLY" | "SEMESTERLY" TODO
-        else if (stream.MatchAndConsume("YEARLY"))
-        {
-            result = Frequency.Yearly;
-        }
-        else
-        {
-            stream.Seek(start);
-
-            return ParseResult.Fail("Unknown frequency", stream);
+            if (stream.MatchAndConsume(frequency.ToString()))
+            {
+                Value = frequency;
+                return ParseResult.Parsed(this);
+            }
         }
 
-        Value = result;
-        return ParseResult.Parsed(this);
+        stream.Seek(start);
+
+        return ParseResult.Fail("Unknown frequency", stream);
     }
 }

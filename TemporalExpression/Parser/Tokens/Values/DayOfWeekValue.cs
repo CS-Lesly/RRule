@@ -8,43 +8,17 @@ public class DayOfWeekValue : ParsableExpression
     {
         int start = stream.Position;
 
-        DayOfWeek result;
-        if (stream.MatchAndConsume("MO"))
+        foreach (DayOfWeek dayOfWeek in Enum.GetValues<DayOfWeek>())
         {
-            result = DayOfWeek.Monday;
-        }
-        else if (stream.MatchAndConsume("TU"))
-        {
-            result = DayOfWeek.Tuesday;
-        }
-        else if (stream.MatchAndConsume("WE"))
-        {
-            result = DayOfWeek.Wednesday;
-        }
-        else if (stream.MatchAndConsume("TH"))
-        {
-            result = DayOfWeek.Thursday;
-        }
-        else if (stream.MatchAndConsume("FR"))
-        {
-            result = DayOfWeek.Friday;
-        }
-        else if (stream.MatchAndConsume("SA"))
-        {
-            result = DayOfWeek.Saturday;
-        }
-        else if (stream.MatchAndConsume("SU"))
-        {
-            result = DayOfWeek.Sunday;
-        }
-        else
-        {
-            stream.Seek(start);
-
-            return ParseResult.Fail("Unknown weekday", stream);
+            if (stream.MatchAndConsume(dayOfWeek.ToString()[..2]))
+            {
+                Value = dayOfWeek;
+                return ParseResult.Parsed(this);
+            }
         }
 
-        Value = result;
-        return ParseResult.Parsed(this);
+        stream.Seek(start);
+
+        return ParseResult.Fail("Unknown weekday", stream);
     }
 }

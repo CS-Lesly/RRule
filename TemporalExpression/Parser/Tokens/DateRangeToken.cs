@@ -7,8 +7,11 @@ namespace TemporalExpression.Parser.Tokens;
 public class DateRangeToken : GrammarToken<DateRangeToken>
 {
     public override Expression Syntax
-        => (new DateOnlyValue() | new DateTimeValue() | new DurationValue()) + SLASH
-         + (new DateOnlyValue() | new DateTimeValue() | new DurationValue());
+        => (DateTimeOrDate | new DurationValue()) + SLASH
+         + (DateTimeOrDate | new DurationValue());
+
+    private static Expression DateTimeOrDate // a DateOnly is also the first part of a DateTime, therefore we must try to parse a DateTime first
+        => new DateTimeValue() | new DateOnlyValue();
 
     public DateRange? Value { get; private set; }
 

@@ -2,11 +2,11 @@ namespace TemporalExpression;
 
 public record DateRange : TemporalComponent, ITemporalExpression
 {
-    protected DateTime _start; // TODO nullable
-  //protected ExtendedTimeSpan? _from;
+    public DateTime? Start;
+    public ExtendedTimeSpan? From;
 
-    protected DateTime? _end;
-  //protected ExtendedTimeSpan? _until;
+    public DateTime? End;
+    public ExtendedTimeSpan? Until;
 
     public IEnumerable<DateTimePoint> ToDateTimePoints(DateTime startDate, DateTime endDate)
     {

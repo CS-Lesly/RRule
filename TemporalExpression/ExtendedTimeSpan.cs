@@ -1,6 +1,6 @@
 namespace TemporalExpression;
 
-public class ExtendedTimeSpan(bool isNegative = false)
+public record ExtendedTimeSpan(bool isNegative = false)
 {
     public bool IsNegative { get; private set; } = isNegative;
 

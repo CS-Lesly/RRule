@@ -13,10 +13,10 @@ public abstract class DateToken<T> : GrammarToken<T> where T : DateToken<T>, new
 
     public override Expression Syntax
         => Prefix +
-        (((SEMICOLON + "VALUE" + EQUALS + "DATE-TIME").Optional() + COLON + new DateTimeValue() + (COMMA + new DateTimeValue()).ZeroOrMore())
-        | (SEMICOLON + "VALUE" + EQUALS + "DATE"                  + COLON + new DateOnlyValue() + (COMMA + new DateOnlyValue()).ZeroOrMore())
+        (((SEMICOLON + "VALUE" + EQUALS + "DATE-TIME").Optional() + COLON + new DateTimeValue()  + (COMMA + new DateTimeValue()).ZeroOrMore())
+        | (SEMICOLON + "VALUE" + EQUALS + "DATE"                  + COLON + new DateOnlyValue()  + (COMMA + new DateOnlyValue()).ZeroOrMore())
          // Note that according to RFC 5545, Section 3.8.5.2, the PERIOD data type is specifically allowed for RDATE (Recurrence Date-Times) properties
-        | (SEMICOLON + "VALUE" + EQUALS + "PERIOD"                + COLON + new PeriodToken()   + (COMMA + new PeriodToken()  ).ZeroOrMore()));
+        | (SEMICOLON + "VALUE" + EQUALS + "PERIOD"                + COLON + new DateRangeToken() + (COMMA + new DateRangeToken()).ZeroOrMore()));
 
     public List<TemporalComponent>? TemporalValues { get; private set; }
 

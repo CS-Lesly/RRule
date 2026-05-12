@@ -4,7 +4,7 @@ using TemporalExpression.Parser.Tokens.Values;
 namespace TemporalExpression.Tests;
 
 [TestFixture]
-public class ParserTests
+public class DurationParserTests
 {
     [Test]
     [TestCaseSource(nameof(GetDurationTestSets))]

@@ -6,19 +6,20 @@ public class DayOfWeekValue : ParsableExpression
     
     public override ParseResult Parse(ref TokenStream stream)
     {
-        int start = stream.Position;
-
-        foreach (DayOfWeek dayOfWeek in Enum.GetValues<DayOfWeek>())
+        if (stream.ConsumeWhile(char.IsLetter, out string? stringValue))
         {
-            if (stream.MatchAndConsume(dayOfWeek.ToString()[..2]))
+            foreach (DayOfWeek dayOfWeek in Enum.GetValues<DayOfWeek>())
             {
-                Value = dayOfWeek;
-                return ParseResult.Parsed(this);
+                if (dayOfWeek.ToString()[..2].Equals(stringValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    Value = dayOfWeek;
+                    return ParseResult.Parsed(this);
+                }
             }
+
+            return ParseResult.Fail($"Invalid weekday: '{stringValue}'", stream);
         }
 
-        stream.Seek(start);
-
-        return ParseResult.Fail("Unknown weekday", stream);
+        return ParseResult.Fail("Expected a weekday value", stream);
     }
 }

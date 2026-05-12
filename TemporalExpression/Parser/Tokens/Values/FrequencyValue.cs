@@ -6,19 +6,20 @@ public class FrequencyValue : ParsableExpression
 
     public override ParseResult Parse(ref TokenStream stream)
     {
-        int start = stream.Position;
-
-        foreach (Frequency frequency in Enum.GetValues<Frequency>())
+        if (stream.ConsumeWhile(char.IsLetter, out string? stringValue))
         {
-            if (stream.MatchAndConsume(frequency.ToString()))
+            foreach (Frequency frequency in Enum.GetValues<Frequency>())
             {
-                Value = frequency;
-                return ParseResult.Parsed(this);
+                if (frequency.ToString().Equals(stringValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    Value = frequency;
+                    return ParseResult.Parsed(this);
+                }
             }
+
+            return ParseResult.Fail($"Invalid frequency: '{stringValue}'", stream);
         }
 
-        stream.Seek(start);
-
-        return ParseResult.Fail("Unknown frequency", stream);
+        return ParseResult.Fail("Expected a frequency value", stream);
     }
 }

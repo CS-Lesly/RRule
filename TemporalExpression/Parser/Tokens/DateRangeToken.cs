@@ -17,34 +17,39 @@ public class DateRangeToken : GrammarToken<DateRangeToken>
 
     public override ParseResult OnParsed([DisallowNull]DateRangeToken dateRange, List<object> tokens, ref TokenStream stream)
     {
+        if (tokens.Count != 2)
+        {
+            return ParseResult.Fail("Invalid date-range format expected date, date-time or duration for begin and end of date-range are required", stream);
+        }
+
         var result = new DateRange();
         switch (tokens[0])
         {
-            case DateOnly dateOnly:
-                result.Start = dateOnly.ToDateTime(TimeOnly.MinValue);
+            case DateTimeValue dateTime:
+                result.Start = dateTime.Value;
                 break;
-            case DateTime dateTime:
-                result.Start = dateTime;
+            case DateOnlyValue dateOnly:
+                result.Start = dateOnly.Value!.Value.ToDateTime(TimeOnly.MinValue);
                 break;
-            case ExtendedTimeSpan extendedTimeSpan:
-                result.From = extendedTimeSpan;
+            case DurationValue extendedTimeSpan:
+                result.From = extendedTimeSpan.Value;
                 break;
             default:
-                return ParseResult.Fail("Invalid date range format expected date-time or duration for begin of date range", stream);
+                return ParseResult.Fail("Invalid date-range format expected date, date-time or duration for begin of date-range", stream);
         }
         switch (tokens[1])
         {
-            case DateOnly dateOnly:
-                result.End = dateOnly.ToDateTime(TimeOnly.MinValue);
+            case DateTimeValue dateTime:
+                result.End = dateTime.Value;
                 break;
-            case DateTime dateTime:
-                result.End = dateTime;
+            case DateOnlyValue dateOnly:
+                result.End = dateOnly.Value!.Value.ToDateTime(TimeOnly.MinValue);
                 break;
-            case ExtendedTimeSpan extendedTimeSpan:
-                result.Until = extendedTimeSpan;
+            case DurationValue extendedTimeSpan:
+                result.Until = extendedTimeSpan.Value;
                 break;
             default:
-                return ParseResult.Fail("Invalid date range format expected date-time or duration for end of date range", stream);
+                return ParseResult.Fail("Invalid date-range format expected date, date-time or duration for end of date-range", stream);
         }
 
         dateRange.Value = result;

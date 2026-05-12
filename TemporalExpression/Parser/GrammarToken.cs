@@ -52,7 +52,7 @@ public abstract class GrammarToken<TToken> : ParsableExpression where TToken : G
             stream.Seek(startPosition);
 
             var result = ExecuteMatch(option, tokens, ref stream);
-            if (result.IsParsed || result.Error.HasValue)
+            if (result.IsParsed) // || result.Error.HasValue)
             {
                 return result;
             }

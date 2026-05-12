@@ -30,12 +30,12 @@ public class Terminal(string value) : Expression
 
 public class Sequence(params Expression[] expressions) : Expression
 {
-    public Expression[] Expressions { get; init; } = expressions;
+    public Expression[] Expressions { get; init; } = [.. expressions.SelectMany(expression => expression is Sequence sequence ? sequence.Expressions : [expression])];
 }
 
 public class Choice(params Expression[] options) : Expression
 {
-    public Expression[] Options { get; init; } = options;
+    public Expression[] Options { get; init; } = [.. options.SelectMany(option => option is Choice choice ? choice.Options : [option])];
 }
 
 public class Optional(Expression expression) : Expression

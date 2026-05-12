@@ -120,7 +120,7 @@ public abstract class GrammarToken<TToken> : ParsableExpression where TToken : G
         // We use a local bucket so we don't pollute the main one if the sequence fails
         var newTokens = new List<object>(); 
 
-        for (int i = 0; i < sequence.Expressions.Length; i++) 
+        for (int i = 0; i < sequence.Expressions.Length; ++i) 
         {
             var result = ExecuteMatch(sequence.Expressions[i], newTokens, ref stream);
             if (!result.IsParsed)

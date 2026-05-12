@@ -25,6 +25,7 @@ public class Terminal(string value) : Expression
     public static Terminal NEWLINE   => new("\r\n");
     public static Terminal PLUS      => new("+");
     public static Terminal MINUS     => new("-");
+    public static Terminal SLASH     => new("/");
 }
 
 public class Sequence(params Expression[] expressions) : Expression

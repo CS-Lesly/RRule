@@ -1,12 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using TemporalExpression.Parser.Tokens.Values;
+using static TemporalExpression.Parser.Terminal;
 
 namespace TemporalExpression.Parser.Tokens;
 
 public class PeriodToken : GrammarToken<PeriodToken>
 {
     public override Expression Syntax
-        => (new DateTimeValue() | new DateOnlyValue() | new DurationValue()) + "/"
+        => (new DateTimeValue() | new DateOnlyValue() | new DurationValue()) + SLASH
          + (new DateTimeValue() | new DateOnlyValue() | new DurationValue());
 
     public DateRange? DateRange { get; private set; }

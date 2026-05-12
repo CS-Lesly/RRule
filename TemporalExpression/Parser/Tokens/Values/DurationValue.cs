@@ -12,14 +12,13 @@ public partial class DurationValue : ParsableExpression
 
     public override ParseResult Parse(ref TokenStream stream)
     {
-            bool isNegative = false;
-            if (stream.MatchAndConsume(PLUS))
-            {
-            }
-            else if (stream.MatchAndConsume(MINUS))
-            {
-                isNegative = true;
-            }
+        if (stream.MatchAndConsume(PLUS))
+        {
+        }
+        else if (stream.MatchAndConsume(MINUS))
+        {
+            return ParseResult.Fail($"Unexpected minus-sign for duration", stream);
+        }
 
         if (!stream.ConsumeWhile(char.IsLetterOrDigit, out string? stringValue))
         {
@@ -32,7 +31,7 @@ public partial class DurationValue : ParsableExpression
             return ParseResult.Fail($"Invalid duration format: '{stringValue}'", stream);
         }
 
-        Value = new ExtendedTimeSpan(isNegative)
+        Value = new ExtendedTimeSpan()
             .WithYears(GetGroupValue(match, "Years"))
             .WithMonths(GetGroupValue(match, "Months"))
             .WithWeeks(GetGroupValue(match, "Weeks"))

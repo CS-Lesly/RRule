@@ -1,9 +1,7 @@
 namespace TemporalExpression;
 
-public record ExtendedTimeSpan(bool isNegative = false)
+public record ExtendedTimeSpan()
 {
-    public bool IsNegative { get; private set; } = isNegative;
-
     public int Years { get; private set; }
 
     public ExtendedTimeSpan WithYears(int years)
@@ -53,16 +51,12 @@ public record ExtendedTimeSpan(bool isNegative = false)
     }
 
     public DateTime CalculateEndDate(DateTime startDate)
-    {
-        int factor = IsNegative ? -1 : 1;
-
-        return startDate
-            .AddYears(Years * factor)
-            .AddMonths(Months * factor)
-            .AddDays(((Weeks * 7) + Days) * factor)
-            .AddHours(Hours * factor)
-            .AddMinutes(Minutes * factor);
-    }
+        => startDate
+            .AddYears(Years)
+            .AddMonths(Months)
+            .AddDays((Weeks * 7) + Days)
+            .AddHours(Hours)
+            .AddMinutes(Minutes);
 
     public DateTimePoint ApplyTo(DateTimePoint start)
     {

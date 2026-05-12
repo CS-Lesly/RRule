@@ -12,7 +12,21 @@ public abstract class RecurrenceRuleToken<T> : GrammarToken<T> where T : Recurre
     protected abstract string Prefix { get; }
 
     public override Expression Syntax
-        => Prefix + COLON + new RecurrenceRuleParameter() + (SEMICOLON + new RecurrenceRuleParameter()).ZeroOrMore();
+        => Prefix + COLON + Parameter + (SEMICOLON + Parameter).ZeroOrMore();
+
+    private static Expression Parameter
+        => ("FREQ"       + EQUALS + new FrequencyValue())
+         | ("INTERVAL"   + EQUALS + new IntervalValue())
+         | ("BYDAY"      + EQUALS + new ByWeekdaysValue())
+         | ("BYMONTHDAY" + EQUALS + new IntegersValue("BYMONTHDAY", signed: true,  minimum: 1, maximum:  31))
+         | ("BYYEARDAY"  + EQUALS + new IntegersValue("BYYEARDAY",  signed: true,  minimum: 1, maximum: 366))
+         | ("BYWEEKNO"   + EQUALS + new IntegersValue("BYWEEKNO",   signed: true,  minimum: 1, maximum:  53))
+         | ("BYMONTH"    + EQUALS + new IntegersValue("BYMONTH",    signed: false, minimum: 1, maximum:  12))
+         | ("BYSETPOS"   + EQUALS + new IntegersValue("BYSETPOS",   signed: true,  minimum: 1, maximum: 366))
+         | ("WKST"       + EQUALS + new DayOfWeekValue())
+         | ("BYHOUR"     + EQUALS + new IntegersValue("BYHOUR",     signed: false, minimum: 0, maximum:  23))
+         | ("BYMINUTE"   + EQUALS + new IntegersValue("BYMINUTE",   signed: false, minimum: 0, maximum:  59))
+         ;
 
     public RecurrenceRule? RecurrenceRule { get; private set; }
 

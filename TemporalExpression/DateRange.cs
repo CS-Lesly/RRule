@@ -10,11 +10,21 @@ public record DateRange : TemporalComponent, ITemporalExpression
 
     public IEnumerable<DateTimePoint> ToDateTimePoints(DateTime startDate, DateTime endDate)
     {
-        yield return DateTimePoint.FromDateTime(_start);
+        var start = Start ?? From!.CalculateEndDate(startDate);
+        start = start < startDate ? startDate : start;
 
-        if (_end.HasValue)
+        yield return DateTimePoint.FromDateTime(start);
+
+        if (End.HasValue)
         {
-            for (var nextDate = _start.AddDays(1); nextDate <= _end.Value; nextDate = nextDate.AddDays(1))
+            for (var nextDate = start.AddDays(1); nextDate <= End.Value && nextDate <= endDate; nextDate = nextDate.AddDays(1))
+            {
+                yield return DateTimePoint.FromDateTime(nextDate);
+            }
+        }
+        else
+        {
+            for (var nextDate = start.AddDays(1); nextDate <= Until!.CalculateEndDate(startDate) && nextDate <= endDate; nextDate = nextDate.AddDays(1))
             {
                 yield return DateTimePoint.FromDateTime(nextDate);
             }

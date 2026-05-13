@@ -1,18 +1,18 @@
 namespace TemporalExpression.Parser;
 
-public ref struct TokenStream
+public ref struct InputStream
 {
     private const char CR = '\r';
     private const char NL = '\n';
     private const char SPACE = ' ';
     private const char HTAB = '\t';
 
-    private readonly ReadOnlySpan<char> _input;
+    public ReadOnlySpan<char> Input { get; init; }
     public int Position { get; private set; } = 0;
 
-    public TokenStream(ReadOnlySpan<char> input)
+    public InputStream(ReadOnlySpan<char> input)
     {
-        _input = input;
+        Input = input;
     }
 
     public readonly (int Line, int Column) GetLocation()
@@ -20,7 +20,7 @@ public ref struct TokenStream
         int line = 1, lastNewline = -1;
         for (int i = 0; i < Position; ++i)
         {
-            if (_input[i] == NL)
+            if (Input[i] == NL)
             {
                 ++line;
                 lastNewline = i;
@@ -40,10 +40,10 @@ public ref struct TokenStream
     }
 
     private readonly int GetFoldLength(int position)
-        => ((position + 2 < _input.Length)
-        && (_input[position] == CR)
-        && (_input[position + 1] == NL)
-        && (_input[position + 2] == SPACE || _input[position + 2] == HTAB))
+        => ((position + 2 < Input.Length)
+        && (Input[position] == CR)
+        && (Input[position + 1] == NL)
+        && (Input[position + 2] == SPACE || Input[position + 2] == HTAB))
         ? 3 // \r\n followed by space or tab is a fold, so skip all three characters
         : 0;
 
@@ -55,7 +55,7 @@ public ref struct TokenStream
         
         foreach (char c in expected)
         {
-            if (temporaryPosition >= _input.Length || char.ToUpperInvariant(_input[temporaryPosition]) != char.ToUpperInvariant(c))
+            if (temporaryPosition >= Input.Length || char.ToUpperInvariant(Input[temporaryPosition]) != char.ToUpperInvariant(c))
             {
                 return false;
             }
@@ -72,7 +72,7 @@ public ref struct TokenStream
     public bool ConsumeWhile(Predicate<char> condition, out string? captured)
     {
         int temporaryPosition = Position;
-        while (temporaryPosition < _input.Length && condition(_input[temporaryPosition]))
+        while (temporaryPosition < Input.Length && condition(Input[temporaryPosition]))
         {
             temporaryPosition = SkipFolds(++temporaryPosition);
         }
@@ -84,7 +84,7 @@ public ref struct TokenStream
         }
         else
         {
-            captured = _input[Position..temporaryPosition].ToString();
+            captured = Input[Position..temporaryPosition].ToString();
         }
 
         Position = temporaryPosition;
@@ -93,4 +93,16 @@ public ref struct TokenStream
     }
 
     public void Seek(int position) => Position = position;
+
+    public readonly Token Parsed(object result, TokenList tokens,  string? target = null) => new(this, tokens[0].StartPosition) { Value = result, Target = target };
+    public readonly Token Parsed(object result, int startPosition, string? target = null) => new(this, startPosition)           { Value = result, Target = target };
+
+    public string? ErrorMessage { get; set; }
+
+    public void Fail(string errorMessage)
+    {
+        var (line, column) = GetLocation();
+
+        ErrorMessage = $"{errorMessage} (Ln {line}, Col {column})";
+    }
 }

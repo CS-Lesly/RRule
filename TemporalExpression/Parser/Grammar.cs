@@ -1,22 +1,33 @@
 namespace TemporalExpression.Parser;
 
-public abstract class Expression
+public abstract class Component(string? name = null)
 {
-    public static implicit operator Expression(char value) => new Terminal(value.ToString());
-    public static implicit operator Expression(string value) => new Terminal(value);
+    public string? Name { get; init; } = name;
+    public virtual string DisplayName => GetType().Name;
 
-    public static Expression operator +(Expression first, Expression second) => new Sequence(first, second);
-    public static Expression operator |(Expression first, Expression second) => new Choice(first, second);
+    //public Component As(string name)
+    //{ TODO
+    //    Name = name;
+    //    return this;
+    //}
 
-    public Expression Optional() => new Optional(this);
+    public static implicit operator Component(char value)   => new Terminal(value.ToString());
+    public static implicit operator Component(string value) => new Terminal(value);
 
-    public Expression ZeroOrMore() => new Repeat(this, minimum: 0);
-    public Expression OneOrMore()  => new Repeat(this, minimum: 1);
+    public static Component operator +(Component firstComponent, Component secondComponent) => new Sequence(firstComponent, secondComponent);
+    public static Component operator |(Component firstOption,    Component secondOption)    => new Choice(  firstOption,    secondOption);
+
+    public Component Optional() => new Optional(this);
+
+    public Component ZeroOrMore() => new Repeat(this, minimum: 0);
+    public Component OneOrMore()  => new Repeat(this, minimum: 1);
 }
 
-public class Terminal(string value) : Expression
+public class Terminal(string value) : Component
 {
     public string Value { get; init; } = value;
+
+    public override string DisplayName => $"`{Value}`";
 
     public static Terminal COLON     => new(":");
     public static Terminal SEMICOLON => new(";");
@@ -28,24 +39,24 @@ public class Terminal(string value) : Expression
     public static Terminal SLASH     => new("/");
 }
 
-public class Sequence(params Expression[] expressions) : Expression
+public class Sequence(params Component[] components) : Component
 {
-    public Expression[] Expressions { get; init; } = [.. expressions.SelectMany(expression => expression is Sequence sequence ? sequence.Expressions : [expression])];
+    public Component[] Components { get; init; } = [.. components.SelectMany(component => component is Sequence sequence ? sequence.Components : [component])];
 }
 
-public class Choice(params Expression[] options) : Expression
+public class Choice(params Component[] options) : Component
 {
-    public Expression[] Options { get; init; } = [.. options.SelectMany(option => option is Choice choice ? choice.Options : [option])];
+    public Component[] Options { get; init; } = [.. options.SelectMany(option => option is Choice choice ? choice.Options : [option])];
 }
 
-public class Optional(Expression expression) : Expression
+public class Optional(Component component) : Component
 {
-    public Expression Expression { get; init; } = expression;
+    public Component Component { get; init; } = component;
 }
 
-public class Repeat(Expression expression, int minimum = 0, int? maximum = null) : Expression
+public class Repeat(Component component, int minimum = 0, int? maximum = null) : Component
 {
-    public Expression Expression { get; init; } = expression;
+    public Component Component { get; init; } = component;
 
     public int Minimum { get; init; } = minimum;
     public int? Maximum { get; init; } = maximum;

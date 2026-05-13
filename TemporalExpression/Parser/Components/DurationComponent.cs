@@ -1,45 +1,49 @@
 using System.Text.RegularExpressions;
 using static TemporalExpression.Parser.Terminal;
 
-namespace TemporalExpression.Parser.Tokens.Values;
+namespace TemporalExpression.Parser.Components;
 
-public partial class DurationValue : ParsableExpression
+public partial class DurationComponent : ParsableComponent // ExtendedTimeSpanComponent?
 {
-    public ExtendedTimeSpan? Value { get; private set; }
+    public override string DisplayName => "a duration";
 
     [GeneratedRegex(@"^P(?:(?<Years>\d+)Y)?(?:(?<Months>\d+)M)?(?:(?<Weeks>\d+)W)?(?:(?<Days>\d+)D)?(?:T(?:(?<Hours>\d+)H)?(?:(?<Minutes>\d+)M)?)?$", RegexOptions.IgnoreCase)]
     private static partial Regex UnsignedDurationRegex();
 
-    public override ParseResult Parse(ref TokenStream stream)
+    public override Token? Parse(ref InputStream stream)
     {
+        int startPosition = stream.Position;
+
         if (stream.MatchAndConsume(PLUS))
         {
         }
         else if (stream.MatchAndConsume(MINUS))
         {
-            return ParseResult.Fail($"Unexpected minus-sign for duration", stream);
+            stream.Fail($"Unexpected minus-sign for duration");
+            return null;
         }
 
         if (!stream.ConsumeWhile(char.IsLetterOrDigit, out string? stringValue))
         {
-            return ParseResult.Fail("Expected a duration value", stream);
+            stream.Fail("Expected a duration value");
+            return null;
         }
 
         var match = UnsignedDurationRegex().Match(stringValue!);
         if (!match.Success)
         {
-            return ParseResult.Fail($"Invalid duration format: '{stringValue}'", stream);
+            stream.Fail($"Invalid duration format: '{stringValue}'");
+            return null;
         }
 
-        Value = new ExtendedTimeSpan()
+        return stream.Parsed(result: new ExtendedTimeSpan()
             .WithYears(GetGroupValue(match, "Years"))
             .WithMonths(GetGroupValue(match, "Months"))
             .WithWeeks(GetGroupValue(match, "Weeks"))
             .WithDays(GetGroupValue(match, "Days"))
             .WithHours(GetGroupValue(match, "Hours"))
-            .WithMinutes(GetGroupValue(match, "Minutes"));
-
-        return ParseResult.Parsed(this);
+            .WithMinutes(GetGroupValue(match, "Minutes"))
+            , startPosition);
     }
 
     private static int GetGroupValue(Match match, string groupName) 

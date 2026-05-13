@@ -1,5 +1,5 @@
 ﻿using TemporalExpression.Parser;
-using TemporalExpression.Parser.Tokens.Values;
+using TemporalExpression.Parser.Components;
 
 namespace TemporalExpression.Tests;
 
@@ -10,39 +10,38 @@ public class DurationParserTests
     [TestCaseSource(nameof(GetDurationTestSets))]
     public void TestDurationParsing(string input, DurationResult expected)
     {
-        var inputStream = new TokenStream(input);
-        var parseResult = new DurationValue().Parse(ref inputStream);
+        var stream = new InputStream(input);
+        var token = new DurationComponent().Parse(ref stream);
 
         if (expected.IsSuccess)
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Null);
-                Assert.That(parseResult.Value, Is.Not.Null);
+                Assert.That(stream.ErrorMessage, Is.Null);
+                Assert.That(token, Is.Not.Null);
             }
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Value, Is.InstanceOf<DurationValue>());
-                Assert.That(((DurationValue)parseResult.Value!).Value, Is.Not.Null);
+                Assert.That(token.Value, Is.InstanceOf<ExtendedTimeSpan>());
             }
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(((DurationValue)parseResult.Value!).Value!.Years,   Is.EqualTo(expected.Years));
-                Assert.That(((DurationValue)parseResult.Value!).Value!.Months,  Is.EqualTo(expected.Months));
-                Assert.That(((DurationValue)parseResult.Value!).Value!.Weeks,   Is.EqualTo(expected.Weeks));
-                Assert.That(((DurationValue)parseResult.Value!).Value!.Days,    Is.EqualTo(expected.Days));
-                Assert.That(((DurationValue)parseResult.Value!).Value!.Hours,   Is.EqualTo(expected.Hours));
-                Assert.That(((DurationValue)parseResult.Value!).Value!.Minutes, Is.EqualTo(expected.Minutes));
+                Assert.That(((ExtendedTimeSpan)token.Value).Years,   Is.EqualTo(expected.Years));
+                Assert.That(((ExtendedTimeSpan)token.Value).Months,  Is.EqualTo(expected.Months));
+                Assert.That(((ExtendedTimeSpan)token.Value).Weeks,   Is.EqualTo(expected.Weeks));
+                Assert.That(((ExtendedTimeSpan)token.Value).Days,    Is.EqualTo(expected.Days));
+                Assert.That(((ExtendedTimeSpan)token.Value).Hours,   Is.EqualTo(expected.Hours));
+                Assert.That(((ExtendedTimeSpan)token.Value).Minutes, Is.EqualTo(expected.Minutes));
             }
         }
         else
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Not.Null);
-                Assert.That(parseResult.Value, Is.Null);
+                Assert.That(stream.ErrorMessage, Is.Not.Null);
+                Assert.That(token, Is.Null);
             }
         }
     }

@@ -40,8 +40,8 @@ public class TemporalExpression : ITemporalExpression
     private static IEnumerable<DateTimePoint> ExpandRuleComponent(TemporalComponent temporalComponent, DateTime startDate, DateTime endDate)
         => temporalComponent switch
         {
-            DateTimeComponent dateTimeComponent => [DateTimePoint.FromDateTime(dateTimeComponent.DateTime)],
-            DateOnlyComponent dateOnlyComponent => [new DateTimePoint(dateOnlyComponent.Date)],
+            DateTimeTemporalComponent dateTimeComponent => [DateTimePoint.FromDateTime(dateTimeComponent.DateTime)],
+            DateOnlyTemporalComponent dateOnlyComponent => [new DateTimePoint(dateOnlyComponent.Date)],
 
             DateRange dateRange => dateRange.ToDateTimePoints(startDate, endDate),
 

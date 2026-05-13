@@ -1,70 +1,68 @@
 ﻿using TemporalExpression.Parser;
-using TemporalExpression.Parser.Tokens;
+using TemporalExpression.Parser.Components;
 
 namespace TemporalExpression.Tests;
 
 [TestFixture]
-public class DateRangeTokenParserTests
+public class DateRangeParserTests
 {
     [Test]
-    [TestCaseSource(nameof(GetDateRangeTokenTestSets))]
-    public void TestDateRangeTokenParsing(string input, DateRangeTokenResult expected)
+    [TestCaseSource(nameof(GetDateRangeTestSets))]
+    public void TestDateRangeParsing(string input, DateRangeResult expected)
     {
-        var inputStream = new TokenStream(input);
-        var parseResult = new DateRangeToken().Parse(ref inputStream);
+        var stream = new InputStream(input);
+        var token = new DateRangeComponent().Parse(ref stream);
 
         if (expected.IsSuccess)
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Null);
-                Assert.That(parseResult.Value, Is.Not.Null);
+                Assert.That(stream.ErrorMessage, Is.Null);
+                Assert.That(token, Is.Not.Null);
             }
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Value, Is.InstanceOf<DateRangeToken>());
-                Assert.That(((DateRangeToken)parseResult.Value!).Value, Is.Not.Null);
+                Assert.That(token.Value, Is.InstanceOf<DateRange>());
+                Assert.That(token.Value, Is.EqualTo(expected.DateRange));
             }
-
-            Assert.That(((DateRangeToken)parseResult.Value!).Value, Is.EqualTo(expected.DateRange));
         }
         else
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Not.Null);
-                Assert.That(parseResult.Value, Is.Null);
+                Assert.That(stream.ErrorMessage, Is.Not.Null);
+                Assert.That(token, Is.Null);
             }
         }
     }
 
-    public record struct DateRangeTokenResult(bool IsSuccess, DateRange? DateRange = default);
+    public record struct DateRangeResult(bool IsSuccess, DateRange? DateRange = default);
 
-    private static IEnumerable<TestCaseData> GetDateRangeTokenTestSets()
+    private static IEnumerable<TestCaseData> GetDateRangeTestSets()
     {
-        yield return new TestCaseData("20260101/P3W", new DateRangeTokenResult(IsSuccess: true, new DateRange()
+        yield return new TestCaseData("20260101/P3W", new DateRangeResult(IsSuccess: true, new DateRange()
             {
                 Start = new DateTime(2026, 1, 1),
                 Until = new ExtendedTimeSpan().WithWeeks(3),
             }))
             .SetName("Valid range: start date and duration")
             .SetCategory("Valid data");
-        yield return new TestCaseData("20260101T1200/+P3W", new DateRangeTokenResult(IsSuccess: true, new DateRange()
+        yield return new TestCaseData("20260101T1200/+P3W", new DateRangeResult(IsSuccess: true, new DateRange()
             {
                 Start = new DateTime(2026, 1, 1, 12, 0, 0),
                 Until = new ExtendedTimeSpan().WithWeeks(3),
             }))
             .SetName("Valid range: start date-time and positive duration")
             .SetCategory("Valid data");
-        yield return new TestCaseData("20260101/20261231", new DateRangeTokenResult(IsSuccess: true, new DateRange()
+        yield return new TestCaseData("20260101/20261231", new DateRangeResult(IsSuccess: true, new DateRange()
             {
                 Start = new DateTime(2026,  1,  1),
                 End   = new DateTime(2026, 12, 31),
             }))
             .SetName("Valid range: start date and end date")
             .SetCategory("Valid data");
-        yield return new TestCaseData("P7M/P1Y", new DateRangeTokenResult(IsSuccess: true, new DateRange()
+        yield return new TestCaseData("P7M/P1Y", new DateRangeResult(IsSuccess: true, new DateRange()
             {
                 From  = new ExtendedTimeSpan().WithMonths(7),
                 Until = new ExtendedTimeSpan().WithYears(1),
@@ -72,10 +70,10 @@ public class DateRangeTokenParserTests
             .SetName("Valid range: start date and end date")
             .SetCategory("Valid data");
 
-        yield return new TestCaseData("20260101P3W", new DateRangeTokenResult(IsSuccess: false))
+        yield return new TestCaseData("20260101P3W", new DateRangeResult(IsSuccess: false))
             .SetName("Invalid range: not a valid range (slash is missing)")
             .SetCategory("Invalid data");
-        yield return new TestCaseData("20260101/-P3W", new DateRangeTokenResult(IsSuccess: false))
+        yield return new TestCaseData("20260101/-P3W", new DateRangeResult(IsSuccess: false))
             .SetName("Invalid range: negative duration not allowed")
             .SetCategory("Invalid data");
     }

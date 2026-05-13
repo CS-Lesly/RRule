@@ -1,21 +1,21 @@
-using TemporalExpression.Parser.Tokens;
+using TemporalExpression.Parser.Components;
 
 namespace TemporalExpression.Parser;
 
 public class TemporalExpressionParser
 {
-    public static TemporalExpression? Parse(string input, out ParseError? result)
+    public static TemporalExpression? Parse(string input, out string? errorMessage)
     {
-        var stream = new TokenStream(input.AsSpan());
-        var parseResult = new TemporalExpressionToken().Parse(ref stream);
-        if (parseResult.IsParsed)
+        var stream = new InputStream(input.AsSpan());
+        var token = new TemporalExpressionComponent().Parse(ref stream);
+        if (token is not null)
         {
-            result = null;
-            return ((TemporalExpressionToken)parseResult.Value!).TemporalExpression;
+            errorMessage = null;
+            return token.ValueAs<TemporalExpression>();
         }
         else
         {
-            result = parseResult.Error ?? new ParseError("Unknown parsing error", stream);
+            errorMessage = stream.ErrorMessage ?? string.Format("Unknown parsing error (Ln {line}, Col {column})", stream.GetLocation()); // TODO
             return null;
         }
     }

@@ -1,5 +1,5 @@
 ﻿using TemporalExpression.Parser;
-using TemporalExpression.Parser.Tokens.Values;
+using TemporalExpression.Parser.Components;
 
 namespace TemporalExpression.Tests;
 
@@ -10,31 +10,29 @@ public class DateParserTests
     [TestCaseSource(nameof(GetDateOnlyTestSets))]
     public void TestDateOnlyParsing(string input, DateOnlyResult expected)
     {
-        var inputStream = new TokenStream(input);
-        var parseResult = new DateOnlyValue().Parse(ref inputStream);
+        var stream = new InputStream(input);
+        var token = new DateOnlyComponent().Parse(ref stream);
 
         if (expected.IsSuccess)
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Null);
-                Assert.That(parseResult.Value, Is.Not.Null);
+                Assert.That(stream.ErrorMessage, Is.Null);
+                Assert.That(token, Is.Not.Null);
             }
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Value, Is.InstanceOf<DateOnlyValue>());
-                Assert.That(((DateOnlyValue)parseResult.Value!).Value, Is.Not.Null);
+                Assert.That(token.Value, Is.InstanceOf<DateOnly>());
+                Assert.That(token.Value, Is.EqualTo(expected.DateOnly));
             }
-
-            Assert.That(((DateOnlyValue)parseResult.Value!).Value!.Value, Is.EqualTo(expected.DateOnly));
         }
         else
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Not.Null);
-                Assert.That(parseResult.Value, Is.Null);
+                Assert.That(stream.ErrorMessage, Is.Not.Null);
+                Assert.That(token, Is.Null);
             }
         }
     }
@@ -59,31 +57,29 @@ public class DateParserTests
     [TestCaseSource(nameof(GetDateTimeTestSets))]
     public void TestDateTimeParsing(string input, DateTimeResult expected)
     {
-        var inputStream = new TokenStream(input);
-        var parseResult = new DateTimeValue().Parse(ref inputStream);
+        var stream = new InputStream(input);
+        var token = new DateTimeComponent().Parse(ref stream);
 
         if (expected.IsSuccess)
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Null);
-                Assert.That(parseResult.Value, Is.Not.Null);
+                Assert.That(stream.ErrorMessage, Is.Null);
+                Assert.That(token, Is.Not.Null);
             }
 
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Value, Is.InstanceOf<DateTimeValue>());
-                Assert.That(((DateTimeValue)parseResult.Value!).Value, Is.Not.Null);
+                Assert.That(token.Value, Is.InstanceOf<DateTime>());
+                Assert.That(token.Value, Is.EqualTo(expected.DateTime));
             }
-
-            Assert.That(((DateTimeValue)parseResult.Value!).Value!.Value, Is.EqualTo(expected.DateTime));
         }
         else
         {
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(parseResult.Error, Is.Not.Null);
-                Assert.That(parseResult.Value, Is.Null);
+                Assert.That(stream.ErrorMessage, Is.Not.Null);
+                Assert.That(token, Is.Null);
             }
         }
     }

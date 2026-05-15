@@ -1,4 +1,4 @@
-using static TemporalExpression.Parser.Literal;
+using static TemporalExpression.Parser.Literals;
 
 namespace TemporalExpression.Parser.Components;
 

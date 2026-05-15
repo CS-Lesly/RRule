@@ -20,18 +20,18 @@ public abstract class CompositeComponent : ParsableComponent
 
     private static Token? ExecuteMatch(Component component, TokenList tokens, ref InputStream stream) => component switch
     {
-        Literal    literal    => HandleLiteral(   literal,    tokens, ref stream),
-        Choice     choice     => HandleChoice(    choice,     tokens, ref stream),
-        Optional   optional   => HandleOptional(  optional,   tokens, ref stream),
-        Repetition repetition => HandleRepetition(repetition, tokens, ref stream),
-        Sequence   sequence   => HandleSequence(  sequence,   tokens, ref stream),
+        LiteralComponent    literal    => HandleLiteral(   literal,    tokens, ref stream),
+        ChoiceComponent     choice     => HandleChoice(    choice,     tokens, ref stream),
+        OptionalComponent   optional   => HandleOptional(  optional,   tokens, ref stream),
+        RepetitionComponent repetition => HandleRepetition(repetition, tokens, ref stream),
+        SequenceComponent   sequence   => HandleSequence(  sequence,   tokens, ref stream),
 
         ParsableComponent parsableComponent => HandleParsableComponent(parsableComponent, tokens, ref stream),
 
         _ => null,
     };
 
-    private static Token? HandleLiteral(Literal literal, TokenList tokens, ref InputStream stream)
+    private static Token? HandleLiteral(LiteralComponent literal, TokenList tokens, ref InputStream stream)
     {
         if (stream.MatchAndConsume(literal.Value))
         {
@@ -43,7 +43,7 @@ public abstract class CompositeComponent : ParsableComponent
         return null;
     }
 
-    private static Token? HandleChoice(Choice choice, TokenList tokens, ref InputStream stream)
+    private static Token? HandleChoice(ChoiceComponent choice, TokenList tokens, ref InputStream stream)
     {
         int startPosition = stream.Position;
 
@@ -63,7 +63,7 @@ public abstract class CompositeComponent : ParsableComponent
         return null;
     }
 
-    private static Token? HandleOptional(Optional optional, TokenList tokens, ref InputStream stream)
+    private static Token? HandleOptional(OptionalComponent optional, TokenList tokens, ref InputStream stream)
     {
         var result = ExecuteMatch(optional.Component, tokens, ref stream);
         if (result is not null || stream.ErrorMessage is not null)
@@ -74,7 +74,7 @@ public abstract class CompositeComponent : ParsableComponent
         return null;
     }
 
-    private static Token? HandleRepetition(Repetition repetition, TokenList tokens, ref InputStream stream)
+    private static Token? HandleRepetition(RepetitionComponent repetition, TokenList tokens, ref InputStream stream)
     {
         int counter = 0;
         while (true)
@@ -117,7 +117,7 @@ public abstract class CompositeComponent : ParsableComponent
         return tokens.Last();
     }
 
-    private static Token? HandleSequence(Sequence sequence, TokenList tokens, ref InputStream stream)
+    private static Token? HandleSequence(SequenceComponent sequence, TokenList tokens, ref InputStream stream)
     {
         int startPosition = stream.Position;
 

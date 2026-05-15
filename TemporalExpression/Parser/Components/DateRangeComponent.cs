@@ -1,4 +1,4 @@
-using static TemporalExpression.Parser.Literal;
+using static TemporalExpression.Parser.Literals;
 
 namespace TemporalExpression.Parser.Components;
 
@@ -13,7 +13,7 @@ public class DateRangeComponent : CompositeComponent
 
     public override Token? OnParsed(TokenList tokens, ref InputStream stream)
     {
-        if (Composition is Sequence sequence && sequence.Components.Length != tokens.Count)
+        if (Composition is SequenceComponent sequence && sequence.Components.Length != tokens.Count)
         {
             stream.Fail("Invalid date-range format expected date, date-time or duration for begin and end of date-range are required");
             return null;

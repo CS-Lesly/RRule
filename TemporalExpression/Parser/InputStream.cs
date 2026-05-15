@@ -47,7 +47,7 @@ public ref struct InputStream
         ? 3 // \r\n followed by space or tab is a fold, so skip all three characters
         : 0;
 
-    public bool MatchAndConsume(Literal expected) => MatchAndConsume(expected.Value);
+    public bool MatchAndConsume(LiteralComponent expected) => MatchAndConsume(expected.Value);
 
     public bool MatchAndConsume(string expected)
     {

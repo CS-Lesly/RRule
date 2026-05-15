@@ -1,21 +1,12 @@
 namespace TemporalExpression.Parser;
 
-public class Literal(string value) : Component, IEquatable<Literal>, IEquatable<string>
+public class LiteralComponent(string value) : Component, IEquatable<LiteralComponent>, IEquatable<string>
 {
     public string Value { get; init; } = value;
 
     public override string DisplayName => $"`{Value}`";
 
-    public static Literal COLON     => new(":");
-    public static Literal SEMICOLON => new(";");
-    public static Literal COMMA     => new(",");
-    public static Literal EQUALS    => new("=");
-    public static Literal NEWLINE   => new("\r\n");
-    public static Literal PLUS      => new("+");
-    public static Literal MINUS     => new("-");
-    public static Literal SLASH     => new("/");
-
-    public static bool operator ==(Literal? left, Literal? right)
+    public static bool operator ==(LiteralComponent? left, LiteralComponent? right)
     {
         if (ReferenceEquals(left, right))
         {
@@ -29,9 +20,9 @@ public class Literal(string value) : Component, IEquatable<Literal>, IEquatable<
 
         return string.Equals(left.Value, right.Value, StringComparison.OrdinalIgnoreCase);
     }
-    public static bool operator !=(Literal? left, Literal? right) => !(left == right);
+    public static bool operator !=(LiteralComponent? left, LiteralComponent? right) => !(left == right);
 
-    public static bool operator ==(Literal? left, string? right)
+    public static bool operator ==(LiteralComponent? left, string? right)
     {
         if (left is null)
         {
@@ -40,12 +31,12 @@ public class Literal(string value) : Component, IEquatable<Literal>, IEquatable<
 
         return string.Equals(left.Value, right, StringComparison.OrdinalIgnoreCase);
     }
-    public static bool operator !=(Literal? left, string? right) => !(left == right);
+    public static bool operator !=(LiteralComponent? left, string? right) => !(left == right);
 
-    public static bool operator ==(string? left, Literal? right) => right == left;
-    public static bool operator !=(string? left, Literal? right) => !(right == left);
+    public static bool operator ==(string? left, LiteralComponent? right) => right == left;
+    public static bool operator !=(string? left, LiteralComponent? right) => !(right == left);
 
-    public bool Equals(Literal? other)
+    public bool Equals(LiteralComponent? other)
     {
         if (ReferenceEquals(this, other))
         {
@@ -64,7 +55,7 @@ public class Literal(string value) : Component, IEquatable<Literal>, IEquatable<
 
     public override bool Equals(object? obj) => obj switch
     {
-        Literal otherLiteral => Equals(otherLiteral),
+        LiteralComponent otherLiteral => Equals(otherLiteral),
         string otherString   => Equals(otherString),
         _                    => false,
     };

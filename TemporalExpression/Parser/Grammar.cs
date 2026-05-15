@@ -19,8 +19,8 @@ public abstract class Component(string? name = null)
 
     public Component Optional() => new Optional(this);
 
-    public Component ZeroOrMore() => new Repeat(this, minimum: 0);
-    public Component OneOrMore()  => new Repeat(this, minimum: 1);
+    public Component ZeroOrMore() => new Repetition(this, minimumCount: 0);
+    public Component OneOrMore()  => new Repetition(this, minimumCount: 1);
 }
 
 public class Sequence(params Component[] components) : Component
@@ -38,10 +38,10 @@ public class Optional(Component component) : Component
     public Component Component { get; init; } = component;
 }
 
-public class Repeat(Component component, int minimum = 0, int? maximum = null) : Component
+public class Repetition(Component component, int minimumCount = 0, int? maximumCount = null) : Component
 {
     public Component Component { get; init; } = component;
 
-    public int Minimum { get; init; } = minimum;
-    public int? Maximum { get; init; } = maximum;
+    public int MinimumCount { get; init; } = minimumCount;
+    public int? MaximumCount { get; init; } = maximumCount;
 }

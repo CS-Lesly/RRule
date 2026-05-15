@@ -20,11 +20,11 @@ public abstract class CompositeComponent : ParsableComponent
 
     private static Token? ExecuteMatch(Component component, TokenList tokens, ref InputStream stream) => component switch
     {
-        Literal  literal =>  HandleLiteral( literal, tokens, ref stream),
-        Choice   choice   => HandleChoice(  choice,   tokens, ref stream),
-        Optional optional => HandleOptional(optional, tokens, ref stream),
-        Repeat   repeat   => HandleRepeat(  repeat,   tokens, ref stream),
-        Sequence sequence => HandleSequence(sequence, tokens, ref stream),
+        Literal    literal    => HandleLiteral(   literal,    tokens, ref stream),
+        Choice     choice     => HandleChoice(    choice,     tokens, ref stream),
+        Optional   optional   => HandleOptional(  optional,   tokens, ref stream),
+        Repetition repetition => HandleRepetition(repetition, tokens, ref stream),
+        Sequence   sequence   => HandleSequence(  sequence,   tokens, ref stream),
 
         ParsableComponent parsableComponent => HandleParsableComponent(parsableComponent, tokens, ref stream),
 
@@ -74,14 +74,14 @@ public abstract class CompositeComponent : ParsableComponent
         return null;
     }
 
-    private static Token? HandleRepeat(Repeat repeat, TokenList tokens, ref InputStream stream)
+    private static Token? HandleRepetition(Repetition repetition, TokenList tokens, ref InputStream stream)
     {
         int counter = 0;
         while (true)
         {
             int startPosition = stream.Position;
 
-            var result = ExecuteMatch(repeat.Component, tokens, ref stream);
+            var result = ExecuteMatch(repetition.Component, tokens, ref stream);
             if (result is not null)
             {
                 ++counter;
@@ -89,28 +89,28 @@ public abstract class CompositeComponent : ParsableComponent
             }
 
             // TODO DEBUG
-            // If we hit a Hard Error (e.g., malformed syntax inside the repeat)
+            // If we hit a Hard Error (e.g., malformed syntax inside the repetition)
             // we must propagate it.
             if (stream.ErrorMessage is not null)
             {
                 return null;
             }
 
-            // If it's a Soft Mismatch, it means the "repeat" is done.
+            // If it's a Soft Mismatch, it means the "repetition" is done.
             // We break the loop and return a Success result.
             stream.Seek(startPosition); 
             break; 
         }
 
-        if (counter < repeat.Minimum)
+        if (counter < repetition.MinimumCount)
         {
-            stream.Fail($"Expected at least {repeat.Minimum} repetitions, but got {counter}");
+            stream.Fail($"Expected at least {repetition.MinimumCount} repetitions, but got {counter}");
             return null;
         }
-        else if (repeat.Maximum.HasValue
-             && (repeat.Maximum.Value < counter))
+        else if (repetition.MaximumCount.HasValue
+             && (repetition.MaximumCount.Value < counter))
         {
-            stream.Fail($"Expected at most {repeat.Maximum.Value} repetitions, but got {counter}");
+            stream.Fail($"Expected at most {repetition.MaximumCount.Value} repetitions, but got {counter}");
             return null;
         }
 

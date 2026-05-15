@@ -20,7 +20,7 @@ public abstract class CompositeComponent : ParsableComponent
 
     private static Token? ExecuteMatch(Component component, TokenList tokens, ref InputStream stream) => component switch
     {
-        Terminal terminal => HandleTerminal(terminal, tokens, ref stream),
+        Literal  literal =>  HandleLiteral( literal, tokens, ref stream),
         Choice   choice   => HandleChoice(  choice,   tokens, ref stream),
         Optional optional => HandleOptional(optional, tokens, ref stream),
         Repeat   repeat   => HandleRepeat(  repeat,   tokens, ref stream),
@@ -31,15 +31,15 @@ public abstract class CompositeComponent : ParsableComponent
         _ => null,
     };
 
-    private static Token? HandleTerminal(Terminal terminal, TokenList tokens, ref InputStream stream)
+    private static Token? HandleLiteral(Literal literal, TokenList tokens, ref InputStream stream)
     {
-        if (stream.MatchAndConsume(terminal.Value))
+        if (stream.MatchAndConsume(literal.Value))
         {
-            tokens.Add(stream.Parsed(terminal.Value, startPosition: stream.Position - terminal.Value.Length));
+            tokens.Add(stream.Parsed(literal.Value, startPosition: stream.Position - literal.Value.Length));
             return tokens.Last();
         }
         
-        stream.Fail($"Expected terminal `{terminal.Value}`");
+        stream.Fail($"Expected literal `{literal.Value}`");
         return null;
     }
 

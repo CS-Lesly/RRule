@@ -11,8 +11,8 @@ public abstract class Component(string? name = null)
     //    return this;
     //}
 
-    public static implicit operator Component(char value)   => new Terminal(value.ToString());
-    public static implicit operator Component(string value) => new Terminal(value);
+    public static implicit operator Component(char value)   => new Literal(value.ToString());
+    public static implicit operator Component(string value) => new Literal(value);
 
     public static Component operator +(Component firstComponent, Component secondComponent) => new Sequence(firstComponent, secondComponent);
     public static Component operator |(Component firstOption,    Component secondOption)    => new Choice(  firstOption,    secondOption);
@@ -21,22 +21,6 @@ public abstract class Component(string? name = null)
 
     public Component ZeroOrMore() => new Repeat(this, minimum: 0);
     public Component OneOrMore()  => new Repeat(this, minimum: 1);
-}
-
-public class Terminal(string value) : Component
-{
-    public string Value { get; init; } = value;
-
-    public override string DisplayName => $"`{Value}`";
-
-    public static Terminal COLON     => new(":");
-    public static Terminal SEMICOLON => new(";");
-    public static Terminal COMMA     => new(",");
-    public static Terminal EQUALS    => new("=");
-    public static Terminal NEWLINE   => new("\r\n");
-    public static Terminal PLUS      => new("+");
-    public static Terminal MINUS     => new("-");
-    public static Terminal SLASH     => new("/");
 }
 
 public class Sequence(params Component[] components) : Component

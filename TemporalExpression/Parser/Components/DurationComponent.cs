@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using static TemporalExpression.Parser.Terminal;
+using static TemporalExpression.Parser.Literal;
 
 namespace TemporalExpression.Parser.Components;
 

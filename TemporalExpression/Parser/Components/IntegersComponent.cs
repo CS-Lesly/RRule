@@ -2,7 +2,7 @@ using static TemporalExpression.Parser.Literals;
 
 namespace TemporalExpression.Parser.Components;
 
-public class IntegersComponent(string target, bool signed, uint minimum = uint.MinValue, uint maximum = uint.MaxValue) : ParsableComponent // TODO Tokenize?
+public class IntegersComponent(string target, bool signed, uint minimum = uint.MinValue, uint maximum = uint.MaxValue) : Component // TODO Tokenize?
 {
     public string Target { get; init; } = target;
     public bool Signed { get; init; } = signed;

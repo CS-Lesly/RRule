@@ -3,7 +3,7 @@ using static TemporalExpression.Parser.Literals;
 
 namespace TemporalExpression.Parser.Components;
 
-public partial class DurationComponent : ParsableComponent // ExtendedTimeSpanComponent?
+public partial class DurationComponent : Component // ExtendedTimeSpanComponent?
 {
     public override string DisplayName => "a duration";
 

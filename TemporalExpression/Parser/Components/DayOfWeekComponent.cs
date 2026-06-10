@@ -1,6 +1,6 @@
 namespace TemporalExpression.Parser.Components;
 
-public class DayOfWeekComponent : ParsableComponent
+public class DayOfWeekComponent : Component
 {
     public override Token? Parse(ref InputStream stream)
     {

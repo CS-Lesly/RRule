@@ -1,6 +1,6 @@
 namespace TemporalExpression.Parser.Components;
 
-public class FrequencyComponent : ParsableComponent
+public class FrequencyComponent : Component
 {
     public override Token? Parse(ref InputStream stream)
     {

@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace TemporalExpression.Parser.Components;
 
-public class DateOnlyComponent : ParsableComponent
+public class DateOnlyComponent : Component
 {
     public override string DisplayName => "a valid date (yyyyMMdd)";
 

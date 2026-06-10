@@ -2,7 +2,7 @@ namespace TemporalExpression.Parser.Components;
 
 public class IntervalComponent : UnsignedIntegerComponent;
 
-public class UnsignedIntegerComponent : ParsableComponent
+public class UnsignedIntegerComponent : Component
 {
     public override Token? Parse(ref InputStream stream)
     {

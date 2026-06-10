@@ -3,7 +3,7 @@ using static TemporalExpression.Parser.Literals;
 namespace TemporalExpression.Parser.Components;
 
 // TODO
-public class SignedIntegerComponent : ParsableComponent
+public class SignedIntegerComponent : Component
 {
     public override Token? Parse(ref InputStream stream)
     {

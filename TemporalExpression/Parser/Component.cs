@@ -5,6 +5,8 @@ public abstract class Component(string? name = null)
     public string? Name { get; init; } = name;
     public virtual string DisplayName => GetType().Name;
 
+    public abstract Token? Parse(ref InputStream stream);
+
     //public Component As(string name)
     //{ TODO
     //    Name = name;

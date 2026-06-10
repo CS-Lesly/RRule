@@ -1,6 +1,6 @@
 namespace TemporalExpression.Parser;
 
-public abstract class CompositeComponent : ParsableComponent
+public abstract class CompositeComponent : Component
 {
     public abstract Component Composition { get; }
     public abstract Token? OnParsed(TokenList tokens, ref InputStream stream);

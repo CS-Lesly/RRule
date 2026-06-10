@@ -2,7 +2,7 @@ using static TemporalExpression.Parser.Literals;
 
 namespace TemporalExpression.Parser.Components;
 
-public class ByWeekdaysComponent : ParsableComponent // TODO Tokenize?
+public class ByWeekdaysComponent : Component // TODO Tokenize?
 {
     public override Token? Parse(ref InputStream stream)
     {

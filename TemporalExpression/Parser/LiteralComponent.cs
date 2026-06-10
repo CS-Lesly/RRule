@@ -1,10 +1,21 @@
 namespace TemporalExpression.Parser;
 
-public class LiteralComponent(string value) : Component, IEquatable<LiteralComponent>, IEquatable<string>
+public sealed class LiteralComponent(string value) : Component, IEquatable<LiteralComponent>, IEquatable<string>
 {
     public string Value { get; init; } = value;
 
     public override string DisplayName => $"`{Value}`";
+
+    public override Token? Parse(ref InputStream stream)
+    {
+        if (stream.MatchAndConsume(Value))
+        {
+            return new Token(Value);
+        }
+
+        stream.Fail($"Expected literal `{Value}`");
+        return null;
+    }
 
     public static bool operator ==(LiteralComponent? left, LiteralComponent? right)
     {

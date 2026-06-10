@@ -51,43 +51,43 @@ public ref struct InputStream
 
     public bool MatchAndConsume(string expected)
     {
-        int temporaryPosition = Position;
+        int currentPosition = Position;
         
         foreach (char c in expected)
         {
-            if (temporaryPosition >= Input.Length || char.ToUpperInvariant(Input[temporaryPosition]) != char.ToUpperInvariant(c))
+            if (currentPosition >= Input.Length || char.ToUpperInvariant(Input[currentPosition]) != char.ToUpperInvariant(c))
             {
                 return false;
             }
-            ++temporaryPosition;
+            ++currentPosition;
 
-            temporaryPosition = SkipFolds(temporaryPosition);
+            currentPosition = SkipFolds(currentPosition);
         }
         
-        Position = temporaryPosition;
+        Position = currentPosition;
         
         return true;
     }
 
     public bool ConsumeWhile(Predicate<char> condition, out string? captured)
     {
-        int temporaryPosition = Position;
-        while (temporaryPosition < Input.Length && condition(Input[temporaryPosition]))
+        int currentPosition = Position;
+        while (currentPosition < Input.Length && condition(Input[currentPosition]))
         {
-            temporaryPosition = SkipFolds(++temporaryPosition);
+            currentPosition = SkipFolds(++currentPosition);
         }
 
-        if (temporaryPosition == Position)
+        if (currentPosition == Position)
         {
             captured = null;
             return false;
         }
         else
         {
-            captured = Input[Position..temporaryPosition].ToString();
+            captured = Input[Position..currentPosition].ToString();
         }
 
-        Position = temporaryPosition;
+        Position = currentPosition;
 
         return true;
     }

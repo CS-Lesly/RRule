@@ -38,7 +38,7 @@ public class ByWeekdaysComponent : Component // TODO Tokenize?
                 return null;
             }
 
-            result.Add((unsignedInteger * factor, (DayOfWeek)parsedDayOfWeek.Value));
+            result.Add((unsignedInteger * factor, (DayOfWeek)parsedDayOfWeek.Value!));
         }
         while (stream.MatchAndConsume(COMMA));
 

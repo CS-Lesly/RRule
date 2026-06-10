@@ -2,19 +2,13 @@ using static TemporalExpression.Parser.Literals;
 
 namespace TemporalExpression.Parser.Components;
 
-public sealed class RDate  : DateComponent { protected override string Prefix => "RDATE";  }
-public sealed class ExDate : DateComponent { protected override string Prefix => "EXDATE"; }
-
-public abstract class DateComponent : CompositeComponent
+public sealed class DateComponent : CompositeComponent
 {
-    protected abstract string Prefix { get; }
-
     public override Component Composition
-        => Prefix +
-        (((SEMICOLON + "VALUE" + EQUALS + "DATE-TIME").Optional() + COLON + new DateTimeComponent()  + (COMMA + new DateTimeComponent()).ZeroOrMore())
-        | (SEMICOLON + "VALUE" + EQUALS + "DATE"                  + COLON + new DateOnlyComponent()  + (COMMA + new DateOnlyComponent()).ZeroOrMore())
-         // Note that according to RFC 5545, Section 3.8.5.2, the PERIOD data type is specifically allowed for RDATE (Recurrence Date-Times) properties
-        | (SEMICOLON + "VALUE" + EQUALS + "PERIOD"                + COLON + new DateRangeComponent() + (COMMA + new DateRangeComponent()).ZeroOrMore()));
+        => ((SEMICOLON + "VALUE" + EQUALS + "DATE-TIME").Optional() + COLON + new DateTimeComponent()  + (COMMA + new DateTimeComponent()).ZeroOrMore())
+          | (SEMICOLON + "VALUE" + EQUALS + "DATE"                  + COLON + new DateOnlyComponent()  + (COMMA + new DateOnlyComponent()).ZeroOrMore())
+          // Note that according to RFC 5545, Section 3.8.5.2, the PERIOD data type is specifically allowed for RDATE (Recurrence Date-Times) properties
+          | (SEMICOLON + "VALUE" + EQUALS + "PERIOD"                + COLON + new DateRangeComponent() + (COMMA + new DateRangeComponent()).ZeroOrMore());
 
     public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream)
     {

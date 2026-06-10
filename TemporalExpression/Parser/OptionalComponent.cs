@@ -2,6 +2,8 @@ namespace TemporalExpression.Parser;
 
 public sealed class OptionalComponent(Component component) : Component
 {
+    // TODO? public override string DisplayName => Component.DisplayName;
+
     public Component Component { get; init; } = component;
 
     public override Token? Parse(ref InputStream stream)

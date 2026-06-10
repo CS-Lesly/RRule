@@ -5,22 +5,24 @@ namespace TemporalExpression.Parser.Components;
 public class TemporalExpressionComponent : CompositeComponent
 {
     public override Component Composition
-        => new RRule() + (NEWLINE + (new RRule() | new ExRule() | new RDate() | new ExDate())).ZeroOrMore();
+        =>  "RRULE"  + new RecurrenceRuleComponent()
+        + (NEWLINE +
+          (("RRULE"  + new RecurrenceRuleComponent())
+         | ("EXRULE" + new RecurrenceRuleComponent())
+         | ("RDATE"  + new DateComponent())
+         | ("EXDATE" + new DateComponent())
+        )).ZeroOrMore();
 
-    public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream)
-    {
-        var result = new TemporalExpression
+    public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream) => new(
+        new TemporalExpression
         {
             Inclusions = [
-                .. tokens.Find<RecurrenceRule>("RRULE"),
-                .. tokens.FindMany<TemporalComponent>("RDATE"),
+                .. tokens.GetResultsAfterLiteral<RecurrenceRule>(new LiteralComponent("RRULE")),
+                .. tokens.GetResultsAfterLiteral<TemporalComponent>(new LiteralComponent("RDATE")),
             ],
             Exclusions = [
-                .. tokens.Find<RecurrenceRule>("EXRULE"),
-                .. tokens.FindMany<TemporalComponent>("EXDATE"),
+                .. tokens.GetResultsAfterLiteral<RecurrenceRule>(new LiteralComponent("EXRULE")),
+                .. tokens.GetResultsAfterLiteral<TemporalComponent>(new LiteralComponent("EXDATE")),
             ],
-        };
-
-        return stream.Parsed(result, tokens);
-    }
+        });
 }

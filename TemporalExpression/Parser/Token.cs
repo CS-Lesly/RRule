@@ -1,21 +1,31 @@
 namespace TemporalExpression.Parser;
 
-public class Token
+public sealed class Token
 {
-    public string? Target { get; init; }
+    // Concrete value (Only set on leaf nodes like Literal)
+    public object? Value { get; init; }
+    public T? ValueAs<T>() => (T?)Value;
 
-  // TODO public InputStream Stream { get; init; }
-    public int StartPosition { get; init; }
-    public int EndPosition { get; init; }
+    // Nested sub-tokens (Populated by structural nodes like Sequence/Repetition)
+    public IReadOnlyList<Token> SubTokens { get; init; }
 
-  // TODO public ReadOnlySpan<char> GetRawString() => Stream.Input[StartPosition..EndPosition];
+    // A fast convenience flag to determine if this node is a branch or a leaf
+    public bool IsLeaf => SubTokens.Count == 0;
 
-    public required object Value { get; init; }
-    public T ValueAs<T>() => (T)Value;
-
-    public Token(InputStream stream, int startPosition)
+    // Constructor for Leaf Nodes (e.g., used by Literal)
+    public Token(object value)
     {
-        StartPosition = startPosition;
-        EndPosition = stream.Position;
+        Value = value;
+        SubTokens = [];
     }
+
+    // Constructor for Structural Parent Nodes (e.g., used by Sequence and Repetition)
+    public Token(IEnumerable<Token> subTokens)
+    {
+        Value = null;
+        SubTokens = subTokens.ToList().AsReadOnly();
+    }
+
+    // Static factory for empty optional placeholders
+    public static Token Empty() => new(string.Empty);
 }

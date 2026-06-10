@@ -10,7 +10,7 @@ public sealed class LiteralComponent(string value) : Component, IEquatable<Liter
     {
         if (stream.MatchAndConsume(Value))
         {
-            return new Token(Value);
+            return new(Value);
         }
 
         stream.Fail($"Expected literal `{Value}`");

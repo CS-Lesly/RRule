@@ -38,6 +38,6 @@ public abstract class DateComponent : CompositeComponent
             }
         }   
 
-        return stream.Parsed(result, tokens, target: Prefix);
+        return new(result);
     }
 }

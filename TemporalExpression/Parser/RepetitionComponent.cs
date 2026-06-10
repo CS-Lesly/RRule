@@ -44,6 +44,6 @@ public sealed class RepetitionComponent(Component component, int minimumCount = 
             return null;
         }
 
-        return new Token(subTokens);
+        return new(subTokens);
     }
 }

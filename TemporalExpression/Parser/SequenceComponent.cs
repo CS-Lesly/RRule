@@ -27,6 +27,6 @@ public sealed class SequenceComponent(params Component[] components) : Component
             subTokens.Add(token);
         }
 
-        return new Token(subTokens);
+        return new(subTokens);
     }
 }

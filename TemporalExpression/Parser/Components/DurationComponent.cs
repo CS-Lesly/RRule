@@ -12,8 +12,6 @@ public partial class DurationComponent : Component // ExtendedTimeSpanComponent?
 
     public override Token? Parse(ref InputStream stream)
     {
-        int startPosition = stream.Position;
-
         if (stream.MatchAndConsume(PLUS))
         {
         }
@@ -36,14 +34,13 @@ public partial class DurationComponent : Component // ExtendedTimeSpanComponent?
             return null;
         }
 
-        return stream.Parsed(result: new ExtendedTimeSpan()
+        return new(new ExtendedTimeSpan()
             .WithYears(GetGroupValue(match, "Years"))
             .WithMonths(GetGroupValue(match, "Months"))
             .WithWeeks(GetGroupValue(match, "Weeks"))
             .WithDays(GetGroupValue(match, "Days"))
             .WithHours(GetGroupValue(match, "Hours"))
-            .WithMinutes(GetGroupValue(match, "Minutes"))
-            , startPosition);
+            .WithMinutes(GetGroupValue(match, "Minutes")));
     }
 
     private static int GetGroupValue(Match match, string groupName) 

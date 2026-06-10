@@ -7,8 +7,6 @@ public class SignedIntegerComponent : Component
 {
     public override Token? Parse(ref InputStream stream)
     {
-        int startPosition = stream.Position;
-
         int factor = 1;
         if (stream.MatchAndConsume(PLUS))
         {
@@ -22,7 +20,7 @@ public class SignedIntegerComponent : Component
         {
             if (int.TryParse(stringValue, out var result))
             {
-                return stream.Parsed(result * factor, startPosition);
+                return new(result * factor);
             }
             else
             {

@@ -8,13 +8,11 @@ public class DateOnlyComponent : Component
 
     public override Token? Parse(ref InputStream stream)
     {
-        int startPosition = stream.Position;
-
         if (stream.ConsumeWhile(char.IsDigit, out string? stringValue))
         {
             if (DateOnly.TryParseExact(stringValue, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
             {
-                return stream.Parsed(result, startPosition);
+                return new(result);
             }
             else
             {

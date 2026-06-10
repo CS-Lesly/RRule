@@ -51,6 +51,6 @@ public class DateRangeComponent : CompositeComponent
                 return null;
         }
 
-        return stream.Parsed(result, tokens);
+        return new(result);
     }
 }

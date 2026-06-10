@@ -6,8 +6,6 @@ public class ByWeekdaysComponent : Component // TODO Tokenize?
 {
     public override Token? Parse(ref InputStream stream)
     {
-        int startPosition = stream.Position;
-
         List<(int, DayOfWeek)> result = [];
         do
         {
@@ -44,6 +42,6 @@ public class ByWeekdaysComponent : Component // TODO Tokenize?
         }
         while (stream.MatchAndConsume(COMMA));
 
-        return stream.Parsed(result.ToArray(), startPosition);
+        return new(result.ToArray());
     }
 }

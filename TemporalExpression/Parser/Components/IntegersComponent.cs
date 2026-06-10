@@ -11,8 +11,6 @@ public class IntegersComponent(string target, bool signed, uint minimum = uint.M
 
     public override Token? Parse(ref InputStream stream)
     {
-        int startPosition = stream.Position;
-
         List<int> result = [];
         do
         {
@@ -51,6 +49,6 @@ public class IntegersComponent(string target, bool signed, uint minimum = uint.M
         }
         while (stream.MatchAndConsume(COMMA));
 
-        return stream.Parsed(result.ToArray(), startPosition, Target);
+        return new(result.ToArray());
     }
 }

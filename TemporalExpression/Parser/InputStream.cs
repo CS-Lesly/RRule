@@ -94,9 +94,6 @@ public ref struct InputStream
 
     public void Seek(int position) => Position = position;
 
-    public readonly Token Parsed(object result, TokenList tokens,  string? target = null) => new(this, tokens[0].StartPosition) { Value = result, Target = target };
-    public readonly Token Parsed(object result, int startPosition, string? target = null) => new(this, startPosition)           { Value = result, Target = target };
-
     public string? ErrorMessage { get; set; }
 
     public void Fail(string errorMessage)

@@ -7,7 +7,7 @@ public class TemporalExpressionComponent : CompositeComponent
     public override Component Composition
         => new RRule() + (NEWLINE + (new RRule() | new ExRule() | new RDate() | new ExDate())).ZeroOrMore();
 
-    public override Token? OnParsed(TokenList tokens, ref InputStream stream)
+    public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream)
     {
         var result = new TemporalExpression
         {

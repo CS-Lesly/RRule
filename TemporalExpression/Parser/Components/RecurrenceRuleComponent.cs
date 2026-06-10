@@ -26,7 +26,7 @@ public abstract class RecurrenceRuleComponent : CompositeComponent
          | ("BYMINUTE"   + EQUALS + new IntegersComponent("BYMINUTE",   signed: false, minimum: 0, maximum:  59))
          ;
 
-    public override Token? OnParsed(TokenList tokens, ref InputStream stream)
+    public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream)
     {
         RecurrenceRule result;
         try

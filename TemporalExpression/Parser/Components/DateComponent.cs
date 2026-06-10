@@ -16,7 +16,7 @@ public abstract class DateComponent : CompositeComponent
          // Note that according to RFC 5545, Section 3.8.5.2, the PERIOD data type is specifically allowed for RDATE (Recurrence Date-Times) properties
         | (SEMICOLON + "VALUE" + EQUALS + "PERIOD"                + COLON + new DateRangeComponent() + (COMMA + new DateRangeComponent()).ZeroOrMore()));
 
-    public override Token? OnParsed(TokenList tokens, ref InputStream stream)
+    public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream)
     {
         var result = new List<TemporalComponent>();
         foreach (var token in tokens)

@@ -3,7 +3,7 @@ namespace TemporalExpression.Parser;
 public abstract class CompositeComponent : Component
 {
     public abstract Component Composition { get; }
-    public abstract Token? OnParsed(TokenList tokens, ref InputStream stream);
+    public abstract Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream);
 
     public sealed override Token? Parse(ref InputStream stream)
     {

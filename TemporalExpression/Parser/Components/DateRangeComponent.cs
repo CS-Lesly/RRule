@@ -11,7 +11,7 @@ public class DateRangeComponent : CompositeComponent
     private static Component DateTimeOrDate // a DateOnly is also the first part of a DateTime, therefore we must try to parse a DateTime first
         => new DateTimeComponent() | new DateOnlyComponent();
 
-    public override Token? OnParsed(TokenList tokens, ref InputStream stream)
+    public override Token? OnParsed(IReadOnlyList<Token> tokens, ref InputStream stream)
     {
         if (Composition is SequenceComponent sequence && sequence.Components.Length != tokens.Count)
         {
